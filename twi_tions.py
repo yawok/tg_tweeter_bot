@@ -1,16 +1,26 @@
 """Needed twitter api functions for telegram bot."""
-from twitter import *
+from tweepy import *
 import config
 
-t = Twitter(auth = OAuth(
-    config.access_key,
-    config.access_secret, 
-    config.customer_key,
-    config.costomer_secret
-    ))
+auth = OAuth1UserHandler( 
+    config.consumer_key,
+    config.consumer_secret,
+    config.access_token,
+    config.access_token_secret
+    )
 
-def send_tweet(this) -> None:
+api = API(auth)
+
+def send_tweet(this) -> int:
     """Sends tweets to twitter account."""
-    tweet = t.statuses.update(status = this)
-    print(f'Tweeted\n{tweet}\nto your account.')
+    tweet = api.update_status(status = this)
+    print(f'Tweeted\n{tweet.id}\nto your account.')
+    
+    return 1
 
+
+def retweet(tweet_id) -> int:
+    """Retweet a tweet."""
+    api.retweet(tweet_id)
+
+    return 1

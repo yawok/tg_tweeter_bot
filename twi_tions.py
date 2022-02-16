@@ -16,11 +16,18 @@ def send_tweet(this) -> int:
     tweet = api.update_status(status = this)
     print(f'Tweeted\n{tweet.id}\nto your account.')
     
-    return 1
+    return tweet.id
 
 
 def retweet(tweet_id) -> int:
     """Retweet a tweet."""
     api.retweet(tweet_id)
+
+    return 1
+
+
+def like(tweet_id) -> int:
+    """Likes a tweet"""
+    api.create_favorite(tweet_id)
 
     return 1

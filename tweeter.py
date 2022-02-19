@@ -27,7 +27,10 @@ def start(update: Update, context: CallbackContext) -> int:
     global chat_id
     chat_id = update.message.chat_id
     reply_keyboard = [['Tweet'], ['Reply to a tweet']]
-    update.message.reply_text(" Do you want to post a tweet or reply to a tweet?",
+    update.message.reply_text("""
+    Hello, welcome to Twitter By yaw.o.k. 
+    Do you want to post a tweet or reply to a tweet?
+    """,
             reply_markup=RKM(
                 reply_keyboard, one_time_keyboard=True, input_field_placeholder="yes or no?"
                 )
@@ -44,12 +47,11 @@ def url_collect(update: Update, context: CallbackContext) -> int:
 
 
 def url(update: Update, context: CallbackContext) -> int:
-    """Collecting url to reply to tweet"""
+    """Saving url"""
     global reply_id
     user_in = update.message.text
     reply_id = user_in.split("/")[-1].split("?")[0]
     tweet_txt = t.get_tweet_txt(reply_id)
-    print(tweet_txt)
 
     reply_keyboard = [['Yes', 'No']]
     update.message.reply_text(f"""
@@ -66,13 +68,13 @@ def url(update: Update, context: CallbackContext) -> int:
 
 
 def tweet_type(update: Update, context: CallbackContext) -> int:
-    """Bot introduction and conversation initialisation"""
+    """Select tweet type."""
     #Storing chat id to send messages wihtout user input later
     global chat_id
     chat_id = update.message.chat_id
     reply_keyboard = [['Caption only'], ['Caption with media']]
-    update.message.reply_text("Hello, welcome to Twitter By yaw.o.k."
-            " What type of tweet do you want to send?", reply_markup=RKM(
+    update.message.reply_text("What type of tweet do you want to send?",
+            reply_markup=RKM(
                 reply_keyboard, one_time_keyboard=True, input_field_placeholder="yes or no?"
                 )
             )
@@ -82,8 +84,7 @@ def tweet_type(update: Update, context: CallbackContext) -> int:
 
 
 def collect_tweet(update: Update, context: CallbackContext) -> int:
-    """Initialise conversation"""
-
+    """Tweet caption collection for tweet without attachments"""
     update.message.reply_text("Enter the tweet")
 
     return TWEET
@@ -112,7 +113,13 @@ def tweet(update: Update, context: CallbackContext) -> int:
 
     reply_markup = IKM(keyboard)
 
-    update.message.reply_text("Would you like to retweet or like?", reply_markup=reply_markup)
+    update.message.reply_text(
+    """
+    Would you like to retweet or like?
+    Press Done to continue when done with interaction
+    """,
+    reply_markup=reply_markup
+    )
 
     return INTERACT
 
@@ -125,11 +132,11 @@ def collect_cap(update: Update, context: CallbackContext) -> int:
 
  
 def no_of_imgs(update: Update, context: CallbackContext) -> int:
-    """Collect images."""
+    """Collect number of images or media type."""
     global caption 
     caption = update.message.text
 
-    reply_keyboard = [['1', '2'], ['3', '4'], ['video']]
+    reply_keyboard = [['1', '2'], ['3', '4'], ['video/gif']]
     update.message.reply_text("How many images do you want to attach to the tweet?")
     update.message.reply_text("""
     How many images do you want to attach to the tweet?
@@ -148,8 +155,8 @@ def collect_img(update: Update, context: CallbackContext) -> int:
     """Collect images."""
     global no_imgs, images
     images.clear()
-    if update.message.text == "video":
-        update.message.reply_text(f"Send video to attach to tweet.")
+    if update.message.text == "video/gif":
+        update.message.reply_text(f"Send a video/gif to attach to tweet.")
     else:
         no_imgs = int(update.message.text)
         update.message.reply_text(f"Send {no_imgs} image(s) to attach to tweet.")
@@ -168,16 +175,17 @@ def confirm(update: Update, context: CallbackContext) -> int:
         
         if no_imgs - len(images) != 0:
             return CONFIRM
+
     elif update.message.video:
         vid = update.message.video.get_file().download(f"images/vid.mp4")
         images.append(vid)
+    
     else :
         gif = update.message.animation.get_file().download(f"images/gif.mp4")
         images.append(gif)
 
-
     reply_keyboard = [['Yes', 'No']]
-    update.message.reply_text("Do you want to send tweet with media",
+    update.message.reply_text("Do you want to send tweet with attached media?",
             reply_markup=RKM(
                 reply_keyboard, one_time_keyboard=True, input_field_placeholder="yes or no?"
                 )
@@ -207,7 +215,13 @@ def tweet_img(update: Update, context: CallbackContext) -> int:
 
     reply_markup = IKM(keyboard)
 
-    update.message.reply_text("Would you like to retweet or like?", reply_markup=reply_markup)
+    update.message.reply_text(
+    """
+    Would you like to retweet or like?
+    Press Done to continue when done with interaction
+    """,
+    reply_markup=reply_markup
+    )
 
     return INTERACT
 

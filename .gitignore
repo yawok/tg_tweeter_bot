@@ -130,4 +130,5 @@ dmypy.json
 
 config.py
 
-images/*.jpg
+images/*
+

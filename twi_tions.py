@@ -11,7 +11,7 @@ auth = OAuth1UserHandler(
 
 api = API(auth)
 
-def send_tweet(this, imgs=[]) -> int:
+def send_tweet(this, reply_id, imgs=[]) -> int:
     """Sends tweets and images."""
     media_ids = []
     if imgs:
@@ -19,7 +19,7 @@ def send_tweet(this, imgs=[]) -> int:
             res = api.media_upload(img)
             media_ids.append(res.media_id)
 
-    tweet = api.update_status(status=this, media_ids=media_ids)
+    tweet = api.update_status(status=this, media_ids=media_ids, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
 
     print(f'Tweeted\n{tweet.id}\nto your account.')
     
@@ -39,3 +39,9 @@ def like(tweet_id) -> int:
 
     return 1
 
+
+def get_tweet_txt(tweet_id) -> str:
+    """Return the text of a tweet."""
+    text = api.get_status(tweet_id).text
+
+    return text

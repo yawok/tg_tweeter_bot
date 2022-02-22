@@ -14,8 +14,28 @@ from telegram import (
         InlineKeyboardButton as IKB,
         InlineKeyboardMarkup as IKM
         )
+import logging
+import datetime as dt
 import twi_tions as t
 import config
+
+#logging 
+today = dt.datetime.today()
+filename = f"logs/{today.month:02d}-{today.day:02d}-{today.year}.log"
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("TweeterBot")
+
+file_handler = logging.FileHandler(filename)
+file_handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter("%(asctime)s: %(levelname)s - %(message)s")
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
+
+
 
 reply_id = ""
 images = []
@@ -23,6 +43,7 @@ URL_COLLECTION, URL_TT, COLLECT_CAP, NO_OF_IMGS, COLLECT_IMG, CONFIRM, TWEET_PHO
 
 def start(update: Update, context: CallbackContext) -> int:
     """Bot introduction and conversation initialisation"""
+    logger.info("User started bot.")
     #Storing chat id to send messages wihtout user input later
     global chat_id
     chat_id = update.message.chat_id
@@ -41,6 +62,7 @@ def start(update: Update, context: CallbackContext) -> int:
 
 def url_collect(update: Update, context: CallbackContext) -> int:
     """Collecting url to reply to tweet"""
+    logger.info(f"'{update.message.text}' selected.")
     update.message.reply_text("Send the link to the tweet you want to reply to.")
 
     return URL_TT
@@ -52,6 +74,7 @@ def url(update: Update, context: CallbackContext) -> int:
     user_in = update.message.text
     reply_id = user_in.split("/")[-1].split("?")[0]
     tweet_txt = t.get_tweet_txt(reply_id)
+    logger.info("tweet id {reply_id} extracted from collected url.")
 
     reply_keyboard = [['Yes', 'No']]
     update.message.reply_text(f"""
@@ -85,6 +108,7 @@ def tweet_type(update: Update, context: CallbackContext) -> int:
 
 def collect_tweet(update: Update, context: CallbackContext) -> int:
     """Tweet caption collection for tweet without attachments"""
+    logger.info("'{update.message.text}' tweet type selected")
     update.message.reply_text("Enter the tweet")
 
     return TWEET
@@ -95,12 +119,13 @@ def tweet(update: Update, context: CallbackContext) -> int:
     user_in = update.message.text
     
     global sent
-    print(reply_id)
     sent = t.send_tweet(user_in, reply_id)
-    if sent:
+    if type(sent) == int:
         update.message.reply_text("Tweet successfully sent.")
+        logger.info("Tweet with caption only sucessfully sent.")
     else: 
         update.message.reply_text("Tweet not sent.")
+        logger.error("Tweet not sent(tweet too long maybe)")
     
     #like or retweet
     keyboard = [
@@ -126,6 +151,7 @@ def tweet(update: Update, context: CallbackContext) -> int:
 
 def collect_cap(update: Update, context: CallbackContext) -> int:
     """Collect caption for images"""
+    logger.info("{update.message.text} selected.")
     update.message.reply_text("Enter the caption for the tweet.")
 
     return NO_OF_IMGS
@@ -133,6 +159,7 @@ def collect_cap(update: Update, context: CallbackContext) -> int:
  
 def no_of_imgs(update: Update, context: CallbackContext) -> int:
     """Collect number of images or media type."""
+    logger.info("Caption collected for Tweet with media.")
     global caption 
     caption = update.message.text
 
@@ -156,8 +183,10 @@ def collect_img(update: Update, context: CallbackContext) -> int:
     global no_imgs, images
     images.clear()
     if update.message.text == "video/gif":
+        logger.info(f"1 {update.message.text} selected as media to attach to caption.")
         update.message.reply_text(f"Send a video/gif to attach to tweet.")
     else:
+        logger.info("{update.message.text} images(s) selected as media to attach to caption.")
         no_imgs = int(update.message.text)
         update.message.reply_text(f"Send {no_imgs} image(s) to attach to tweet.")
     
@@ -179,11 +208,14 @@ def confirm(update: Update, context: CallbackContext) -> int:
     elif update.message.video:
         vid = update.message.video.get_file().download(f"images/vid.mp4")
         images.append(vid)
+        logger.info("Video collected.")
     
     else :
         gif = update.message.animation.get_file().download(f"images/gif.mp4")
         images.append(gif)
-
+        logger.info("Gif collected.")
+    
+    logger.info("{no_imgs} images collected.")
     reply_keyboard = [['Yes', 'No']]
     update.message.reply_text("Do you want to send tweet with attached media?",
             reply_markup=RKM(
@@ -201,8 +233,10 @@ def tweet_img(update: Update, context: CallbackContext) -> int:
     sent = t.send_tweet(caption, reply_id, imgs=images)
     if sent:
         update.message.reply_text("Tweet successfully sent.")
+        logger.info("Tweet with media attachments sent.")
     else: 
         update.message.reply_text("Tweet not sent.")
+        logger.error("Tweet with media attachments not sent.")
     
     #like or retweet
     keyboard = [
@@ -234,10 +268,12 @@ def button(update: Update, context: CallbackContext) -> int:
     
     if query.data == "1":
         t.like(sent)
+        logger.info("Recent tweet liked.")
 
         return INTERACT
 
     elif query.data == "2":
+        logger.info("Recent tweet retweeted.")
         t.retweet(sent)
 
         return INTERACT
@@ -261,6 +297,7 @@ def button(update: Update, context: CallbackContext) -> int:
 
 def help(update: Update, context: CallbackContext) -> None:
     """Bot guide"""
+    logger.info("Bot help viewed.")
     update.message.reply_text("""
             Welcome to Twitter for yaw.o.k.
             Just follow the bot's requests to send tweet.

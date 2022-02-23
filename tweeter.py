@@ -19,7 +19,7 @@ from telegram import (
 import logging
 import datetime as dt
 import twi_tions as t
-import config
+#import config
 
 #load_dotenv()
 

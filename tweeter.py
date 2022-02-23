@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import os
 from telegram.ext import (
         CallbackContext,
@@ -21,7 +21,7 @@ import datetime as dt
 import twi_tions as t
 import config
 
-load_dotenv()
+#load_dotenv()
 
 #setting port number for webhook
 PORT = os.environ.get("PORT", "8443")
@@ -57,12 +57,12 @@ def auth(update: Update, context: CallbackContext) -> int:
     user_in = update.message.text
     if attempts == 0:
         logger.warning("Intruder Alert!")
-    if user_in != os.getenv("PASSWORD") and attempts > 0:
+    if user_in != os.environ["PASSWORD"] and attempts > 0:
         attempts -= 1
         logger.info(f"Authentication failed. {attempts} attempts left.")
         update.message.reply_text("Enter password to continue.")
         return AUTH
-    elif user_in == os.getenv("PASSWORD") and attempts > 0:
+    elif user_in == os.environ["PASSWORD"] and attempts > 0:
         logger.info("User authenticated as yaw.o.k. {attemps} attemps left.")
         #Storing chat id to send messages wihtout user input later
         global chat_id
@@ -325,7 +325,7 @@ def help(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
     """Run the bot"""
-    updater = Updater(os.getenv("TOKEN"))
+    updater = Updater(os.environ["TOKEN"])
     disp = updater.dispatcher
     
     conv = ConversationHandler(entry_points = [CommandHandler("start", start)],
@@ -358,8 +358,9 @@ def main() -> None:
     updater.start_webhook(
             listen="0.0.0.0",
             port=PORT,
-            url_path=os.getenv("TOKEN"),
-            webhook_url="https://git.heroku.com/telegram-tweeter.git/" + os.getenv("TOKEN")
+            url_path=os.environ["TOKEN"],
+            webhook_url="https://telegram-tweeter.herokuapp.com/" + os.environ["TOKEN"]
+
             )
     updater.idle()
 

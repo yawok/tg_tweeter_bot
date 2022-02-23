@@ -24,7 +24,7 @@ import config
 load_dotenv()
 
 #setting port number for webhook
-PORT = int(os.environ.get("PORT", 80))
+PORT = os.environ.get("PORT", "8443")
 
 #logging 
 today = dt.datetime.today()
@@ -355,8 +355,12 @@ def main() -> None:
             )
 
     disp.add_handler(conv)
-    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=os.getenv("TOKEN"))
-    updater.bot.setWebhook("https://git.heroku.com/telegram-tweeter.git/" + os.getenv("TOKEN"))
+    updater.start_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            url_path=os.getenv("TOKEN"),
+            webhook_url="https://git.heroku.com/telegram-tweeter.git/" + os.getenv("TOKEN")
+            )
     updater.idle()
 
 

@@ -38,30 +38,42 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
 
-
-
-
 reply_id = ""
+attempts = 4
 images = []
-URL_COLLECTION, URL_TT, COLLECT_CAP, NO_OF_IMGS, COLLECT_IMG, CONFIRM, TWEET_PHOTO, TWEET, INTERACT = range(9)
+AUTH, URL_COLLECTION, URL_TT, COLLECT_CAP, NO_OF_IMGS, COLLECT_IMG, CONFIRM, TWEET_PHOTO, TWEET, INTERACT = range(10)
 
 def start(update: Update, context: CallbackContext) -> int:
-    """Bot introduction and conversation initialisation"""
-    logger.info("User started bot.")
-    #Storing chat id to send messages wihtout user input later
-    global chat_id
-    chat_id = update.message.chat_id
-    reply_keyboard = [['Tweet'], ['Reply to a tweet']]
-    update.message.reply_text("""
-    Hello, welcome to Twitter By yaw.o.k. 
-    Do you want to post a tweet or reply to a tweet?
-    """,
-            reply_markup=RKM(
-                reply_keyboard, one_time_keyboard=True, input_field_placeholder="yes or no?"
-                )
-            )
+    logger.info("Bot started")
+    update.message.reply_text("Enter password to continue.")
+    return AUTH
     
-    return URL_COLLECTION
+def auth(update: Update, context: CallbackContext) -> int:
+    """Bot introduction and conversation initialisation"""
+    global attempts
+    user_in = update.message.text
+    if attempts == 0:
+        logger.warning("Intruder Alert!")
+    if user_in != os.getenv("PASSWORD") and attempts > 0:
+        attempts -= 1
+        logger.info(f"Authentication failed. {attempts} attempts left.")
+        update.message.reply_text("Enter password to continue.")
+        return AUTH
+    elif user_in == os.getenv("PASSWORD") and attempts > 0:
+        logger.info("User authenticated as yaw.o.k. {attemps} attemps left.")
+        #Storing chat id to send messages wihtout user input later
+        global chat_id
+        chat_id = update.message.chat_id
+        reply_keyboard = [['Tweet'], ['Reply to a tweet']]
+        update.message.reply_text("""
+        Welcome yaw.o.k! 
+        Do you want to post a tweet or reply to a tweet?
+        """,
+                reply_markup=RKM(
+                    reply_keyboard, one_time_keyboard=True, input_field_placeholder="yes or no?"
+                    )
+                )
+        return URL_COLLECTION
 
 
 def url_collect(update: Update, context: CallbackContext) -> int:
@@ -315,6 +327,7 @@ def main() -> None:
     
     conv = ConversationHandler(entry_points = [CommandHandler("start", start)],
             states ={
+                AUTH: [MessageHandler(Filters.text, auth)],
                 URL_COLLECTION: [
                     MessageHandler(Filters.regex('^(Yes)$') | Filters.regex('^(Tweet)$'), tweet_type),
                     MessageHandler(Filters.regex('^(No)$'), start), 

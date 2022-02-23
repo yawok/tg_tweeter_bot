@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+import os
 from telegram.ext import (
         CallbackContext,
         Updater,
@@ -19,6 +21,8 @@ import datetime as dt
 import twi_tions as t
 import config
 
+load_dotenv()
+
 #logging 
 today = dt.datetime.today()
 filename = f"logs/{today.month:02d}-{today.day:02d}-{today.year}.log"
@@ -29,7 +33,7 @@ logger = logging.getLogger("TweeterBot")
 file_handler = logging.FileHandler(filename)
 file_handler.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter("%(asctime)s: %(levelname)s - %(message)s")
+formatter = logging.Formatter("%(asctime)s: %(name)s: %(levelname)s - %(message)s")
 file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
@@ -306,7 +310,7 @@ def help(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
     """Run the bot"""
-    updater = Updater(config.TOKEN)
+    updater = Updater(os.getenv("TOKEN"))
     disp = updater.dispatcher
     
     conv = ConversationHandler(entry_points = [CommandHandler("start", start)],

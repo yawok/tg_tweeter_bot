@@ -28,7 +28,7 @@ PORT = os.environ.get("PORT", "8443")
 
 #logging 
 today = dt.datetime.today()
-filename = f"logs/{today.month:02d}-{today.day:02d}-{today.year}.log"
+filename = f"{today.month:02d}-{today.day:02d}-{today.year}.log"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("TweeterBot")
@@ -217,7 +217,7 @@ def confirm(update: Update, context: CallbackContext) -> int:
     global images
     if update.message.photo:
         photo = update.message.photo[-1]
-        img = photo.get_file().download(f"images/img{len(images)}.jpg")
+        img = photo.get_file().download(f"img{len(images)}.jpg")
         images.append(img)
         print(len(images))
         
@@ -225,12 +225,12 @@ def confirm(update: Update, context: CallbackContext) -> int:
             return CONFIRM
 
     elif update.message.video:
-        vid = update.message.video.get_file().download(f"images/vid.mp4")
+        vid = update.message.video.get_file().download(f"vid.mp4")
         images.append(vid)
         logger.info("Video collected.")
     
     else :
-        gif = update.message.animation.get_file().download(f"images/gif.mp4")
+        gif = update.message.animation.get_file().download(f"gif.mp4")
         images.append(gif)
         logger.info("Gif collected.")
     

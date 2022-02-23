@@ -1,16 +1,16 @@
 """Needed twitter api functions for telegram bot."""
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import os
 from tweepy import *
 import config
 
-load_dotenv()
+#load_dotenv()
 
 auth = OAuth1UserHandler(
-        os.getenv("consumer_key"),
-        os.getenv("consumer_secret"),
-        os.getenv("access_token"),
-        os.getenv("access_token_secret")
+        os.environ["consumer_key"],
+        os.environ["consumer_secret"],
+        os.environ["access_token"],
+        os.environ["access_token_secret"]
     )
 
 api = API(auth)

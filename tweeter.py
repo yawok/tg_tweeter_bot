@@ -356,7 +356,7 @@ def main() -> None:
 
     disp.add_handler(conv)
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=os.getenv("TOKEN"))
-    updater.bot.setWebhook("" + os.getenv("TOKEN"))
+    updater.bot.setWebhook("https://git.heroku.com/telegram-tweeter.git/" + os.getenv("TOKEN"))
     updater.idle()
 
 

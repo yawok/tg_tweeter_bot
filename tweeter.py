@@ -23,6 +23,9 @@ import config
 
 load_dotenv()
 
+#setting port number for webhook
+PORT = int(os.environ.get("PORT", 80))
+
 #logging 
 today = dt.datetime.today()
 filename = f"logs/{today.month:02d}-{today.day:02d}-{today.year}.log"
@@ -352,7 +355,8 @@ def main() -> None:
             )
 
     disp.add_handler(conv)
-    updater.start_polling()
+    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=os.getenv("TOKEN"))
+    updater.bot.setWebhook("" + os.getenv("TOKEN"))
     updater.idle()
 
 

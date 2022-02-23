@@ -2,7 +2,7 @@
 #from dotenv import load_dotenv
 import os
 from tweepy import *
-import config
+#import config
 
 #load_dotenv()
 

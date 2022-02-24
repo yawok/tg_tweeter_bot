@@ -1,1 +1,2 @@
-web : python3 tweeter.py
+web: python3 tweeter.py
+worker: python3 tweeter.py

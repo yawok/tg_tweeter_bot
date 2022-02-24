@@ -24,7 +24,7 @@ import twi_tions as t
 #load_dotenv()
 
 #setting port number for webhook
-PORT = os.environ.get("PORT", "8443")
+PORT = int(os.environ.get("PORT", 8443))
 
 #logging 
 today = dt.datetime.today()
@@ -360,7 +360,6 @@ def main() -> None:
             port=PORT,
             url_path=os.environ["TOKEN"],
             webhook_url="https://telegram-tweeter.herokuapp.com/" + os.environ["TOKEN"]
-
             )
     updater.idle()
 

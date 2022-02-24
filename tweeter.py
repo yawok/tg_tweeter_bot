@@ -357,7 +357,7 @@ def main() -> None:
     disp.add_handler(conv)
     updater.start_webhook(
             listen="0.0.0.0",
-            port=PORT,
+            port=8443,
             url_path=os.environ["TOKEN"],
             webhook_url="https://telegram-tweeter.herokuapp.com/" + os.environ["TOKEN"]
             )
